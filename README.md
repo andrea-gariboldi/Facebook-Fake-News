@@ -8,8 +8,9 @@ This GitHub repository contains the code and dataset for a project focused on **
 1. [Introduction](#introduction)
 2. [Project Structure](#project-structure)
 3. [Code](#code)
-4. [Dataset](#dataset)
-5. [License](#license)
+4. [Creating Feature Vectors](#creating-feature-vectors)
+5. [Dataset](#dataset)
+6. [License](#license)
 
 ## Introduction
 
@@ -32,8 +33,20 @@ The file **ReproductionGuide.pdf** provides a detailed guide for reproducing the
 The `code` folder contains all the necessary scripts and code for the project. Key files include:
 
 - `Scraper.py`: the script used for scraping the data from the Facebook pages (it uses [facebook-scraper](https://pypi.org/project/facebook-scraper/)).
+- `PostVectorized.py`: defines the six feature extraction functions and the container for a vectorized post.
+- `PostVectorization.py`: reads posts from PostgreSQL, extracts their features, and writes them to a second database.
 
 Feel free to explore the code and adapt it to your specific needs.
+
+## Creating Feature Vectors
+
+Feature extraction converts each Facebook post into **36 numeric features**: six reaction counts, four sentiment scores, five basic post statistics, seven part-of-speech counts, seven named-entity counts, and seven text-length statistics. The class label is stored separately from these features.
+
+You can start from `dataset/json/real_news.json` and `dataset/json/fake_news.json` without scraping Facebook again. Text features use the post's `text` field, which includes the post description and shared-link text when present.
+
+See the [feature-vector guide](code/README.md#creating-feature-vectors-from-json) for dependency installation, a runnable JSON-to-CSV example, the exact feature order, and the original PostgreSQL workflow. The example writes the six individual feature sets and the two combined sets into a separate output directory.
+
+If you only need the existing vectors, use [dataset/csv](dataset/csv) or the Weka-ready files in [dataset/arff](dataset/arff). The supplied CSVs contain 4,927 rows, compared with 4,934 raw JSON posts; the original script silently skips posts that raise an error.
 
 ## Dataset
 
