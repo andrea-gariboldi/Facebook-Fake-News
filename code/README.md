@@ -119,9 +119,13 @@ The example reports extraction failures and omits the affected post from every o
 
 - The original CSV header `pronouns` corresponds to `PROPN` (proper nouns), not pronouns. The example preserves that header for compatibility.
 - The POS function counts the literal tag `CONJ`. Models using `CCONJ` or `SCONJ` will not contribute to that count.
-- The reaction function reads `haha`, while some supplied JSON records use `ahah`. Those records receive a zero in the `haha` position. The `hug` reaction is not included in the six reaction features.
+- The reaction function reads `haha`, as used in the supplied JSON files. The example record in the dataset README instead uses `ahah`; an input using that spelling would receive a zero in the `haha` position. The `hug` reaction is not included in the six reaction features.
 - The original database schema declares `textLengthsVector` as an integer array even though its final two values are averages. The supplied CSVs contain integer averages; this direct export preserves the floating-point values returned by the function. It therefore does not promise an exact recreation of the committed CSVs.
-- The supplied JSON files contain 4,934 posts; the committed CSVs each contain 4,927 rows. `PostVectorization.py` catches exceptions without reporting them, so the source code alone does not establish why those seven posts were omitted.
+- The supplied JSON files contain 4,934 posts; seven have null `text`. Running the direct export skips those seven posts and produces 4,927 rows, matching the committed CSV row count. For null text, the sentiment function first prints an error and then raises an exception because `sentiment_dict` was never assigned. The original database script silently catches that exception.
+
+### Verified example
+
+The JSON-to-CSV example was run against both complete JSON files with Python 3.12.13, spaCy 3.8.16, `en_core_web_sm` 3.8.0, and vaderSentiment 3.3.2. All eight exports contained 4,927 aligned rows (2,940 `True`, 1,987 `False`), with no missing or nonfinite feature values. Checks confirmed the CSV headers, agreement between individual and combined feature sets, raw reaction/share/comment counts, sentiment ranges, and text-length average formulas. Separate checks covered empty text and missing reaction types. The PostgreSQL workflow was not executed.
 
 ## Original PostgreSQL workflow
 
